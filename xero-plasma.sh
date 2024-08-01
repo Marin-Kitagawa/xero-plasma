@@ -80,36 +80,6 @@ grub-mkconfig -o /boot/grub/grub.cfg
 echo "Installing other useful applications..."
 install_packages "linux-headers pacman-contrib meld timeshift elisa mpv gnome-disk-utility btop gum inxi"
 
-echo "Detecting if you are using a VM"
-result=$(systemd-detect-virt)
-case $result in
-  oracle)
-    echo "Installing virtualbox-guest-utils..."
-    install_packages "virtualbox-guest-utils"
-    ;;
-  kvm)
-    echo "Installing qemu-guest-agent and spice-vdagent..."
-    install_packages "qemu-guest-agent spice-vdagent"
-    ;;
-  vmware)
-    echo "Installing xf86-video-vmware and open-vm-tools..."
-    install_packages "xf86-video-vmware open-vm-tools xf86-input-vmmouse"
-    systemctl enable vmtoolsd.service
-    ;;
-  *)
-    echo "You are not running in a VM."
-    ;;
-esac
-
-# Prompt for adding XeroLinux repo and installing Paru/Toolkit using dialog
-if dialog --stdout --title "Add XeroLinux Repo & Install Toolkit" --yesno "\nWould you like to add the XeroLinux repository and install Paru & the Xero-Toolkit?\n\nIt is recommended as it will make things like driver and package configuration easier." 12 50; then
-  echo "Adding XeroLinux Repository..."
-  echo -e '\n[xerolinux]\nSigLevel = Optional TrustAll\nServer = https://repos.xerolinux.xyz/$repo/$arch' | tee -a /etc/pacman.conf
-  sed -i '/^\s*#\s*\[multilib\]/,/^$/ s/^#//' /etc/pacman.conf
-  echo "Installing Paru/Toolkit..."
-  pacman -Syy --noconfirm paru-bin xlapit-cli
-fi
-
 dialog --title "Installation Complete" --msgbox "\nInstallation Complete. Done, now exit and reboot.\n\nFor further customization, if you opted to install our Toolkit, please find it in AppMenu under System or by typing xero-cli in terminal." 12 50
 
 # Exit chroot and reboot
