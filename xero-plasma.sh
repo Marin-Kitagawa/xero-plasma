@@ -80,6 +80,14 @@ grub-mkconfig -o /boot/grub/grub.cfg
 echo "Installing other useful applications..."
 install_packages "linux-headers pacman-contrib meld timeshift elisa mpv gnome-disk-utility btop gum inxi"
 
+if dialog --stdout --title "Add XeroLinux Repo & Install Toolkit" --yesno "\nWould you like to add the XeroLinux repository and install Paru & the Xero-Toolkit?\n\nIt is recommended as it will make things like driver and package configuration easier." 12 50; then
+  echo "Adding XeroLinux Repository..."
+  echo -e '\n[xerolinux]\nSigLevel = Optional TrustAll\nServer = https://repos.xerolinux.xyz/$repo/$arch' | tee -a /etc/pacman.conf
+  sed -i '/^\s*#\s*\[multilib\]/,/^$/ s/^#//' /etc/pacman.conf
+  echo "Installing Paru/Toolkit..."
+  pacman -Syy --noconfirm xlapit-cli
+fi
+
 dialog --title "Installation Complete" --msgbox "\nInstallation Complete. Done, now exit and reboot.\n\nFor further customization, if you opted to install our Toolkit, please find it in AppMenu under System or by typing xero-cli in terminal." 12 50
 
 # Exit chroot and reboot
